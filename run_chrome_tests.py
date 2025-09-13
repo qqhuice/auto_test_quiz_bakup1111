@@ -319,49 +319,85 @@ class ChromeTestRunner:
                 "status": "✅ PASS" if success else "❌ FAIL"
             },
             {
+                "id": "TC004",
+                "name": "NoSuchElementException异常测试",
+                "description": "测试当页面元素不存在时的异常处理",
+                "steps": [
+                    "1. 导航到异常测试页面",
+                    "2. 点击Add按钮",
+                    "3. 立即查找Row 2输入框(不等待DOM更新)",
+                    "4. 捕获NoSuchElementException异常",
+                    "5. 验证异常处理机制",
+                    "6. 记录异常信息",
+                    "7. 截图记录异常状态"
+                ],
+                "expected_result": "正确捕获并处理NoSuchElementException异常",
+                "status": "✅ PASS" if success else "❌ FAIL"
+            },
+            {
+                "id": "TC005",
+                "name": "ElementNotInteractableException异常测试",
+                "description": "测试当页面元素不可交互时的异常处理",
+                "steps": [
+                    "1. 导航到异常测试页面",
+                    "2. 点击Add按钮",
+                    "3. 等待Row 2加载",
+                    "4. 在Row 2输入框中输入文本",
+                    "5. 尝试点击不可见的Save按钮",
+                    "6. 捕获ElementNotInteractableException异常",
+                    "7. 验证异常处理机制",
+                    "8. 记录异常信息",
+                    "9. 截图记录异常状态"
+                ],
+                "expected_result": "正确捕获并处理ElementNotInteractableException异常",
+                "status": "✅ PASS" if success else "❌ FAIL"
+            },
+            {
                 "id": "TC006",
                 "name": "InvalidElementStateException异常测试",
-                "description": "验证InvalidElementStateException的正确捕获和处理",
+                "description": "测试尝试清空禁用输入框时的异常处理",
                 "steps": [
-                    "1. 导航到异常测试页面: https://practicetestautomation.com/practice-test-exceptions/",
-                    "2. 滚动到页面标题处",
-                    "3. 尝试清空禁用的输入框",
-                    "4. 捕获InvalidElementStateException异常",
-                    "5. 显示异常信息面板",
-                    "6. 截图记录异常捕获过程"
+                    "1. 导航到异常测试页面",
+                    "2. 尝试清空禁用的输入框",
+                    "3. 捕获InvalidElementStateException异常",
+                    "4. 验证异常处理机制",
+                    "5. 记录异常信息",
+                    "6. 截图记录异常状态"
                 ],
-                "expected_result": "成功捕获InvalidElementStateException，显示异常信息",
+                "expected_result": "正确捕获并处理InvalidElementStateException异常",
                 "status": "✅ PASS" if success else "❌ FAIL"
             },
             {
                 "id": "TC007",
                 "name": "StaleElementReferenceException异常测试",
-                "description": "验证StaleElementReferenceException的正确捕获和处理",
+                "description": "测试获取元素引用后点击Add按钮移除元素时的异常处理",
                 "steps": [
-                    "1. 导航到异常测试页面: https://practicetestautomation.com/practice-test-exceptions/",
+                    "1. 导航到异常测试页面",
                     "2. 获取instructions元素的引用",
                     "3. 点击Add按钮移除instructions元素",
                     "4. 尝试访问已过期的元素引用",
                     "5. 捕获StaleElementReferenceException异常",
-                    "6. 显示异常信息面板",
-                    "7. 截图记录异常捕获过程"
+                    "6. 验证异常处理机制",
+                    "7. 记录异常信息",
+                    "8. 截图记录异常状态"
                 ],
-                "expected_result": "成功捕获StaleElementReferenceException，显示异常信息",
+                "expected_result": "正确捕获并处理StaleElementReferenceException异常",
                 "status": "✅ PASS" if success else "❌ FAIL"
             },
             {
                 "id": "TC008",
                 "name": "TimeoutException异常测试",
-                "description": "验证TimeoutException的正确捕获和处理",
+                "description": "测试设置3秒超时等待Row 2出现(需要5秒)时的异常处理",
                 "steps": [
-                    "1. 导航到异常测试页面: https://practicetestautomation.com/practice-test-exceptions/",
+                    "1. 导航到异常测试页面",
                     "2. 点击Add按钮",
                     "3. 设置3秒超时等待Row 2出现(但Row 2需要5秒才出现)",
                     "4. 捕获TimeoutException异常",
-                    "5. 显示异常信息面板",
-                    "6. 截图记录异常捕获过程"
+                    "5. 验证异常处理机制",
+                    "6. 记录异常信息",
+                    "7. 截图记录异常状态"
                 ],
-                "expected_result": "成功捕获TimeoutException，显示异常信息",
+                "expected_result": "正确捕获并处理TimeoutException异常",
                 "status": "✅ PASS" if success else "❌ FAIL"
             }
         ]
