@@ -1,10 +1,5 @@
 # Auto Test Quiz - Python Selenium 自动化测试项目
 
-[![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)
-[![Selenium](https://img.shields.io/badge/Selenium-4.0%2B-green.svg)](https://selenium.dev/)
-[![Pytest](https://img.shields.io/badge/Pytest-7.0%2B-orange.svg)](https://pytest.org/)
-[![BDD](https://img.shields.io/badge/BDD-Behave-purple.svg)](https://behave.readthedocs.io/)
-
 ## 📋 项目概述
 
 这是一个基于Python的Web自动化测试项目，使用Selenium WebDriver实现了完整的浏览器自动化测试框架。项目支持Chrome和Edge浏览器，包含登录功能测试、异常处理测试和BDD行为驱动测试。
