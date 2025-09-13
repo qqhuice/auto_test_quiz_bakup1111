@@ -855,9 +855,8 @@ class ChromeTestRunner:
 
 📊 测试统计:
   ├── 测试用例总数: 8个
-  ├── 网站访问测试: 1个
   ├── 登录功能测试: 3个 (正确凭据、错误用户名、错误密码)
-  └── 异常处理测试: 4个 (导航 + 3个异常类型)
+  └── 异常捕获测试: 5个 (NoSuchElement、ElementNotInteractable、InvalidElementState、StaleElementReference、Timeout)
 
 🔧 测试特性:
   ✅ 每个测试用例都有详细的步骤说明
@@ -872,9 +871,8 @@ class ChromeTestRunner:
   └── 📄 详细HTML报告: Chrome_Detailed_Test_Report_*.html
 
 🎯 测试覆盖范围:
-  ✅ 基础功能测试 (网站访问、页面导航)
   ✅ 登录功能测试 (正确凭据、错误用户名、错误密码)
-  ✅ 异常处理测试 (NoSuchElement、ElementNotInteractable、Timeout等)
+  ✅ 异常捕获测试 (NoSuchElement、ElementNotInteractable、InvalidElementState、StaleElementReference、Timeout)
   ✅ 错误信息验证和截图记录
   ✅ 程序稳定性和健壮性验证
 
@@ -897,6 +895,18 @@ class ChromeTestRunner:
             format="{time:HH:mm:ss} | {level} | {message}",
             level="INFO",
             colorize=True
+        )
+        # 添加文件日志
+        from pathlib import Path
+        logs_dir = Path("logs")
+        logs_dir.mkdir(exist_ok=True)
+        logger.add(
+            logs_dir / "chrome_tests.log",
+            format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}",
+            level="DEBUG",
+            rotation="10 MB",
+            retention="7 days",
+            encoding="utf-8"
         )
 
         start_time = datetime.now()

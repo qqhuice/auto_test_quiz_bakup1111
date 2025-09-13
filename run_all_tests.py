@@ -33,7 +33,9 @@ class TestExecutor:
         # 确保目录存在
         self.reports_dir.mkdir(exist_ok=True)
         self.screenshots_dir.mkdir(exist_ok=True)
-        
+        logs_dir = self.project_root / "logs"
+        logs_dir.mkdir(exist_ok=True)
+
         # 配置日志
         logger.remove()
         logger.add(
@@ -41,6 +43,15 @@ class TestExecutor:
             format="{time:HH:mm:ss} | {level} | {message}",
             level="INFO",
             colorize=True
+        )
+        # 添加文件日志
+        logger.add(
+            logs_dir / "run_all_tests.log",
+            format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}",
+            level="DEBUG",
+            rotation="10 MB",
+            retention="7 days",
+            encoding="utf-8"
         )
     
     def print_banner(self, title: str, width: int = 80):
@@ -237,14 +248,16 @@ class TestExecutor:
         print(f"⏱️  总执行时间: {duration}")
         print(f"📅 完成时间: {end_time.strftime('%Y-%m-%d %H:%M:%S')}")
         
-        # 执行结果统计
-        success_count = sum([chrome_success, edge_success, bdd_success])
+        # 执行完成提示（注意：这里的"成功"指脚本正常执行完成，具体测试结果请查看详细报告）
+        executed_count = sum([chrome_success, edge_success, bdd_success])
         total_count = 3
-        
-        print(f"\n📊 执行结果统计:")
-        print(f"  ✅ 成功: {success_count}/{total_count}")
-        print(f"  ❌ 失败: {total_count - success_count}/{total_count}")
-        print(f"  📈 成功率: {success_count/total_count*100:.1f}%")
+
+        print(f"\n📊 脚本执行统计:")
+        print(f"  ✅ 正常执行: {executed_count}/{total_count}")
+        print(f"  ❌ 执行异常: {total_count - executed_count}/{total_count}")
+        print(f"  📈 执行完成率: {executed_count/total_count*100:.1f}%")
+        print(f"\n⚠️  注意: 上述统计仅表示脚本是否正常执行完成")
+        print(f"  📊 具体测试用例的成功/失败情况请查看详细的HTML报告")
         
         print(f"\n💡 提示:")
         print(f"  - 所有报告文件都在 reports/ 目录下")

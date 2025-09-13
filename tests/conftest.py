@@ -33,8 +33,11 @@ def pytest_configure(config_obj):
     )
     
     # 添加文件日志处理器
+    logs_dir = Path("logs")
+    logs_dir.mkdir(exist_ok=True)
+
     logger.add(
-        "reports/test.log",
+        "logs/test.log",
         format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {name}:{function}:{line} | {message}",
         level="DEBUG",
         rotation="10 MB",

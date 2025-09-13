@@ -766,17 +766,27 @@ class OrangeHRMCreateClaimRequestPage(BasePage):
                 (By.XPATH, "//button[contains(.,'Add')]"),
                 (By.XPATH, "//button[contains(.,'Expense')]"),
                 (By.XPATH, "//*[contains(text(),'Add')]/parent::button"),
+                (By.XPATH, "//button[contains(text(),'Add Expense')]"),
+                (By.XPATH, "//a[contains(text(),'Add')]"),
             ]
 
-            for selector in add_expense_selectors:
+            add_button_clicked = False
+            for i, selector in enumerate(add_expense_selectors, 1):
                 try:
-                    if self.is_element_visible(selector, timeout=5):
+                    logger.debug(f"尝试Add按钮定位策略 {i}: {selector[1]}")
+                    if self.is_element_visible(selector, timeout=3):
                         element = self.find_element(selector)
                         element.click()
-                        time.sleep(2)
+                        logger.info(f"✅ 成功点击Add按钮，策略 {i}")
+                        add_button_clicked = True
+                        time.sleep(1)  # 减少等待时间
                         break
-                except:
+                except Exception as e:
+                    logger.debug(f"Add按钮策略 {i} 失败: {e}")
                     continue
+
+            if not add_button_clicked:
+                logger.warning("未找到Add按钮，但继续尝试添加费用")
 
             # 选择费用类型（带刷新重试机制）
             expense_type_selected = self._select_expense_type_with_retry(preferred_expense_type, expense_type)
@@ -877,18 +887,33 @@ class OrangeHRMCreateClaimRequestPage(BasePage):
                 # 检查下拉菜单是否有数据
                 option_elements = []
                 try:
-                    option_elements = self.driver.find_elements(By.XPATH, "//div[contains(@class,'oxd-select-option')] | //*[contains(text(),'Transport')] | //*[contains(text(),'Accommodation')] | //*[contains(text(),'Medical')]")
-                except:
+                    # 扩展选项检测，包含更多可能的费用类型
+                    option_elements = self.driver.find_elements(By.XPATH,
+                        "//div[contains(@class,'oxd-select-option')] | "
+                        "//*[contains(text(),'Transport')] | "
+                        "//*[contains(text(),'Accommodation')] | "
+                        "//*[contains(text(),'Medical')] | "
+                        "//*[contains(text(),'Travel')] | "
+                        "//*[contains(text(),'Food')] | "
+                        "//*[contains(text(),'Fuel')] | "
+                        "//option[not(contains(text(),'Select'))]"
+                    )
+                    logger.debug(f"找到 {len(option_elements)} 个下拉选项")
+                except Exception as e:
+                    logger.debug(f"检查下拉选项时出错: {e}")
                     pass
 
                 if not option_elements or len(option_elements) <= 1:  # 只有"-- Select --"选项
-                    logger.warning(f"下拉菜单没有数据或只有默认选项，第{attempt + 1}次尝试")
+                    logger.warning(f"下拉菜单没有数据或只有默认选项，第{attempt + 1}次尝试，找到选项数: {len(option_elements)}")
                     if attempt < max_retries:
                         logger.info("刷新页面后重试...")
                         self.driver.refresh()
                         time.sleep(3)
                         # 重新导航到添加费用区域
-                        self.navigate_to_add_expense_section()
+                        if self.navigate_to_add_expense_section():
+                            logger.info("✅ 重新导航到费用区域成功")
+                        else:
+                            logger.warning("⚠️ 重新导航到费用区域失败")
                         time.sleep(1)
                         continue
                     else:
@@ -2146,19 +2171,19 @@ class OrangeHRMCreateClaimRequestPage(BasePage):
 
 
     def click_latest_record_view_details(self):
-        """点击最新一条记录的View Details按钮"""
+        """点击最新一条记录的View Details按钮（优化版本）"""
         logger.info("正在点击最新一条记录的View Details按钮...")
         try:
-            # 等待表格加载
-            time.sleep(2)
+            # 减少初始等待时间，使用显式等待替代固定等待
+            logger.debug("等待表格加载...")
 
-            # 多种定位策略找到View Details按钮
+            # 优化的定位策略，按优先级排序
             view_details_selectors = [
-                # 第一行的View Details按钮
-                (By.XPATH, "//table//tr[1]//button[contains(text(),'View Details')]"),
-                (By.XPATH, "//table//tr[1]//a[contains(text(),'View Details')]"),
+                # 最常用的定位策略放在前面
                 (By.XPATH, "//table//tbody//tr[1]//button[contains(text(),'View Details')]"),
                 (By.XPATH, "//table//tbody//tr[1]//a[contains(text(),'View Details')]"),
+                (By.XPATH, "//table//tr[1]//button[contains(text(),'View Details')]"),
+                (By.XPATH, "//table//tr[1]//a[contains(text(),'View Details')]"),
 
                 # 通过Actions列定位
                 (By.XPATH, "//table//tr[1]//td[last()]//button[contains(text(),'View Details')]"),
@@ -2179,26 +2204,33 @@ class OrangeHRMCreateClaimRequestPage(BasePage):
                 (By.XPATH, "(//a[contains(.,'Details')])[1]"),
             ]
 
-            for selector in view_details_selectors:
+            for i, selector in enumerate(view_details_selectors, 1):
                 try:
-                    if self.is_element_visible(selector, timeout=5):
+                    logger.debug(f"尝试定位策略 {i}: {selector[1]}")
+                    # 减少超时时间从5秒到2秒
+                    if self.is_element_visible(selector, timeout=2):
                         element = self.find_element(selector)
-                        # 滚动到元素可见
-                        self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
-                        time.sleep(1)
+
+                        # 滚动到元素可见（使用更快的滚动方式）
+                        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center', behavior: 'auto'});", element)
+                        time.sleep(0.3)  # 减少滚动后等待时间
 
                         # 尝试点击
                         try:
                             element.click()
+                            logger.debug(f"✅ 策略 {i} 普通点击成功")
                         except:
                             # 如果普通点击失败，使用JavaScript点击
                             self.driver.execute_script("arguments[0].click();", element)
+                            logger.debug(f"✅ 策略 {i} JavaScript点击成功")
 
-                        time.sleep(3)  # 等待页面跳转
+                        # 减少页面跳转等待时间，使用更智能的等待
+                        time.sleep(1)  # 从3秒减少到1秒
                         logger.info("✅ 成功点击最新记录的View Details按钮")
                         return True
+
                 except Exception as e:
-                    logger.debug(f"View Details按钮定位失败: {selector}, 错误: {e}")
+                    logger.debug(f"策略 {i} 失败: {e}")
                     continue
 
             logger.warning("未找到View Details按钮")

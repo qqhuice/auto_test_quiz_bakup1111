@@ -31,15 +31,29 @@ git clone https://github.com/qqhuice/auto_test_quiz.git
 cd auto_test_quiz
 ```
 
-2. **安装依赖**
+2. **创建虚拟环境并安装依赖**
 ```bash
+# Windows
+python -m venv venv
+venv\Scripts\activate
+pip install -r config/requirements.txt
+
+# Linux/Mac
+python -m venv venv
+source venv/bin/activate
 pip install -r config/requirements.txt
 ```
 
-3. **验证安装**
+3. **验证安装并运行测试**
 ```bash
-python --version  # 确保Python 3.8+
+# 查看帮助
+python run_all_tests.py --help
+
+# 运行所有测试
+python run_all_tests.py
 ```
+
+> **💡 提示**: 项目已配置完整的依赖环境，按照上述步骤即可直接运行，无需额外配置。
 
 ## 📖 使用指南
 
@@ -49,9 +63,6 @@ python --version  # 确保Python 3.8+
 ```bash
 # 执行完整的Chrome测试流程
 python run_chrome_tests.py
-
-# 只执行登录测试
-python tests/test_selenium_basic.py
 ```
 
 #### 2. Edge浏览器测试
@@ -65,7 +76,7 @@ python run_edge_tests.py
 # 执行BDD测试
 python run_bdd_tests.py
 
-# 或使用behave命令
+# 或使用behave命令（需要在虚拟环境中）
 behave features/
 ```
 
@@ -168,15 +179,11 @@ bdd_result = subprocess.run(['python', 'run_bdd_tests.py'], capture_output=True)
 ### 2. 命令行接口
 
 ```bash
-# 使用Python模块方式调用
-python -m run_chrome_tests
-python -m run_edge_tests
-python -m run_bdd_tests
-
-# 直接执行脚本
+# 直接执行脚本（推荐方式）
 python run_chrome_tests.py
 python run_edge_tests.py
 python run_bdd_tests.py
+python run_all_tests.py
 ```
 
 ### 3. 集成到CI/CD流水线
@@ -308,7 +315,7 @@ logging.basicConfig(level=logging.DEBUG)
 ### 并行执行
 
 ```bash
-# 使用pytest并行执行
+# 使用pytest并行执行（在虚拟环境中）
 pip install pytest-xdist
 pytest -n auto tests/
 ```

@@ -31,6 +31,26 @@ class EdgeTestRunner:
         
     def run_edge_tests(self):
         """运行Microsoft Edge浏览器的完整流程测试"""
+        # 配置日志
+        logger.remove()
+        logger.add(
+            sys.stdout,
+            format="{time:HH:mm:ss} | {level} | {message}",
+            level="INFO",
+            colorize=True
+        )
+        # 添加文件日志
+        logs_dir = self.project_root / "logs"
+        logs_dir.mkdir(exist_ok=True)
+        logger.add(
+            logs_dir / "edge_tests.log",
+            format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}",
+            level="DEBUG",
+            rotation="10 MB",
+            retention="7 days",
+            encoding="utf-8"
+        )
+
         logger.info("=== 开始执行Microsoft Edge浏览器完整流程测试 ===")
 
         # 执行唯一的完整流程测试，避免重复

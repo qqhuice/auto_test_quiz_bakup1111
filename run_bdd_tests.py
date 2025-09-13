@@ -190,7 +190,7 @@ def main() -> bool:
         create_claim_request_page.screenshot_helper(get_bdd_screenshot_path(bdd_screenshot_dir, "assign_claim_request_event_type.png"))
         create_claim_request_page.select_currency("Euro")
         print("✅ Assign Claims记录创建成功")
-        # time.sleep(2)
+        time.sleep(2)
         create_claim_request_page.screenshot_helper(get_bdd_screenshot_path(bdd_screenshot_dir, "assign_claim_request.png"))
         test_results["steps"].append({"step": 1, "name": "创建Assign Claims记录", "status": "SUCCESS"})
     else:
@@ -205,10 +205,10 @@ def main() -> bool:
     print("Step 2: 正在点击Create按钮...")
     if create_claim_request_page.click_create_button():
         print("✅ Create按钮点击成功")
-        time.sleep(2)
+        time.sleep(1)
         # 成功提示信息截图
         create_claim_request_page.screenshot_helper(get_bdd_screenshot_path(bdd_screenshot_dir, "assign_claim_request_success.png"))
-        time.sleep(2)
+        time.sleep(2.5)
         # 详情页截图
         create_claim_request_page.screenshot_helper(get_bdd_screenshot_path(bdd_screenshot_dir, "assign_claim_request_detail.png"))
         test_results["steps"].append({"step": 2, "name": "点击Create按钮", "status": "SUCCESS"})
@@ -251,18 +251,23 @@ def main() -> bool:
         driver.quit()
         return False
 
-    # Step 4: 添加Expenses，选择Expense Type和Date，填写amount，点击Submit，验证成功提示信息，截图
+    # Step 4: 添加Expenses，优先选择Transport类型，如果下拉菜单为空则自动刷新重试
     print("Step 4: 正在添加Expense费用...")
+    print("  - 优先选择Transport类型")
+    print("  - 如果expense_type下拉菜单为空，将自动刷新页面重试")
+    print("  - 支持自动选择任意可用的费用类型")
     expense_success = False
 
     # 在Assign Claim详情页添加费用
     if create_claim_request_page.navigate_to_add_expense_section():
+        # 使用优化后的add_expense方法，自动处理下拉菜单为空的情况
         if create_claim_request_page.add_expense("Transport", "2023-05-01", "50"):
             if create_claim_request_page.submit_expense():
                 print("✅ Expense添加成功")
-                # 滚动到最底部
+                print("  - 费用类型: Transport (或其他可用类型)")
+                print("  - 日期: 2023-05-01")
+                print("  - 金额: 50")
                 # 截图
-                #time.sleep(0.5)
                 create_claim_request_page.screenshot_helper(get_bdd_screenshot_path(bdd_screenshot_dir, "add_expense_success.png"))
                 test_results["steps"].append({"step": 4, "name": "添加Expense费用", "status": "SUCCESS"})
                 test_results["expense_success"] = True
@@ -274,6 +279,7 @@ def main() -> bool:
                 test_results["errors"].append("Step 4: Expense提交失败")
         else:
             print("❌ Expense添加失败")
+            print("  - 可能原因: 下拉菜单持续为空，或页面元素定位失败")
             create_claim_request_page.screenshot_helper(get_bdd_screenshot_path(bdd_screenshot_dir, "expense_add_failed.png"))
             test_results["steps"].append({"step": 4, "name": "添加Expense费用", "status": "FAILED", "error": "Expense添加失败"})
             test_results["errors"].append("Step 4: Expense添加失败")
@@ -303,6 +309,7 @@ def main() -> bool:
     # 滚动到最底部，点击 Back
     create_claim_request_page.scroll_to_bottom()
     create_claim_request_page.click_back_button()
+    time.sleep(2)
 
     # Step 6: 验证Record中存在刚才的提交记录，截图
     create_claim_request_page.scroll_to_latest_record()
