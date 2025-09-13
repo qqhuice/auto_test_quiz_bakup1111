@@ -1,0 +1,1261 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edge浏览器自动化测试详细报告</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #0078d4;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #0078d4;
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .header .subtitle {
+            color: #666;
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+        .summary {
+            background: linear-gradient(135deg, #0078d4 0%, #106ebe 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .summary h2 {
+            margin-top: 0;
+            color: white;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .summary-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .summary-item .label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        .summary-item .value {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .test-case {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .test-case-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .test-case-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+        }
+        .test-case-id {
+            background: #0078d4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+        .test-case-status {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .test-case-content {
+            padding: 20px;
+        }
+        .test-description {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196f3;
+        }
+        .test-steps {
+            margin-bottom: 20px;
+        }
+        .test-steps h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .test-steps .step-list {
+            padding-left: 0;
+            list-style: none;
+        }
+        .test-steps li {
+            margin-bottom: 8px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .expected-result {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #4caf50;
+        }
+        .expected-result h4 {
+            color: #2e7d32;
+            margin-top: 0;
+        }
+        .pass { color: #28a745; }
+        .fail { color: #dc3545; }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #666;
+        }
+        .files-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .files-section h3 {
+            color: #333;
+            margin-top: 0;
+        }
+        .file-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        .file-item {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .file-item .file-type {
+            color: #0078d4;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .file-item .file-count {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+        .screenshots-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #17a2b8;
+        }
+        .screenshots-section h4 {
+            color: #17a2b8;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .screenshot-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .screenshot-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid #ddd;
+        }
+        .screenshot-item .screenshot-info {
+            padding: 10px;
+        }
+        .screenshot-item .screenshot-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .screenshot-item .screenshot-path {
+            font-size: 0.85em;
+            color: #666;
+            word-break: break-all;
+        }
+        .screenshot-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
+                        linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
+                        linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
+                        linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 0.9em;
+            border-bottom: 1px solid #ddd;
+        }
+        .screenshot-info-only {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #2196f3;
+            margin-top: 15px;
+        }
+        .screenshot-info-only h5 {
+            color: #1976d2;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .screenshot-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .screenshot-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .screenshot-list li:last-child {
+            border-bottom: none;
+        }
+        .screenshot-name {
+            font-weight: 500;
+            color: #333;
+        }
+        .screenshot-status {
+            font-size: 0.85em;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌐 Edge浏览器自动化测试详细报告</h1>
+            <div class="subtitle">Practice Test Automation 完整测试流程</div>
+            <div class="subtitle">执行时间: 2025-09-13 10:55:59</div>
+        </div>
+
+        <div class="summary">
+            <h2>📊 测试执行总结</h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="label">测试状态</div>
+                    <div class="value">✅ 成功</div>
+                </div>
+                <div class="summary-item">
+                    <div class="label">测试用例总数</div>
+                    <div class="value">8</div>
+                </div>
+                <div class="summary-item">
+                    <div class="label">通过用例</div>
+                    <div class="value">8</div>
+                </div>
+                <div class="summary-item">
+                    <div class="label">失败用例</div>
+                    <div class="value">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="files-section">
+            <h3>📁 生成的测试文件</h3>
+            <div class="file-list">
+                <div class="file-item">
+                    <div class="file-type">📊 HTML报告</div>
+                    <div class="file-count">Edge测试报告</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-type">📸 截图目录</div>
+                    <div class="file-count">Edge测试截图</div>
+                </div>
+            </div>
+        </div>
+
+        <h2>📋 详细测试用例</h2>
+
+        <div class="test-case">
+            <div class="test-case-header">
+                <div>
+                    <span class="test-case-id">TC001</span>
+                    <span class="test-case-title">正确凭据登录测试</span>
+                </div>
+                <div class="test-case-status pass">✅ PASS</div>
+            </div>
+            <div class="test-case-content">
+                <div class="test-description">
+                    <strong>测试描述:</strong> 使用正确的用户名和密码进行登录测试
+                </div>
+
+                <div class="test-steps">
+                    <h4>🔧 测试步骤:</h4>
+                    <ul class="step-list">
+                        <li>1. 导航到登录页面: https://practicetestautomation.com/practice-test-login/</li>
+                        <li>2. 在用户名输入框输入'student'</li>
+                        <li>3. 在密码输入框输入'Password123'</li>
+                        <li>4. 点击'Submit'按钮</li>
+                        <li>5. 验证登录成功页面</li>
+                        <li>6. 截图记录登录结果</li>
+
+                    </ul>
+                </div>
+
+                <div class="expected-result">
+                    <h4>✅ 预期结果:</h4>
+                    <p>成功登录并跳转到主页面</p>
+                </div>
+
+
+                <div class="screenshots-section">
+                    <h4>📸 测试截图 (5张)</h4>
+                    <div class="screenshot-grid">
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/登录用例1_输入正确用户名_Edge_2025-09-13_10-53-33-958.png" alt="登录用例1_输入正确用户名"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\登录用例1_输入正确用户名_Edge_2025-09-13_10-53-33-958.png</div>
+                                        <div><strong>文件大小:</strong> 71492 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">登录用例1_输入正确用户名</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\登录用例1_输入正确用户名_Edge_2025-09-13_10-53-33-958.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/登录用例1_输入正确密码_Edge_2025-09-13_10-53-35-238.png" alt="登录用例1_输入正确密码"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\登录用例1_输入正确密码_Edge_2025-09-13_10-53-35-238.png</div>
+                                        <div><strong>文件大小:</strong> 33486 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">登录用例1_输入正确密码</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\登录用例1_输入正确密码_Edge_2025-09-13_10-53-35-238.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/登录用例1_正确凭据登录_Edge_2025-09-13_10-53-39-452.png" alt="登录用例1_正确凭据登录"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\登录用例1_正确凭据登录_Edge_2025-09-13_10-53-39-452.png</div>
+                                        <div><strong>文件大小:</strong> 59449 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">登录用例1_正确凭据登录</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\登录用例1_正确凭据登录_Edge_2025-09-13_10-53-39-452.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/登录用例1_登录成功验证_Edge_2025-09-13_10-53-39-601.png" alt="登录用例1_登录成功验证"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\登录用例1_登录成功验证_Edge_2025-09-13_10-53-39-601.png</div>
+                                        <div><strong>文件大小:</strong> 59449 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">登录用例1_登录成功验证</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\登录用例1_登录成功验证_Edge_2025-09-13_10-53-39-601.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/登录用例1_登出操作_Edge_2025-09-13_10-53-42-183.png" alt="登录用例1_登出操作"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\登录用例1_登出操作_Edge_2025-09-13_10-53-42-183.png</div>
+                                        <div><strong>文件大小:</strong> 70095 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">登录用例1_登出操作</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\登录用例1_登出操作_Edge_2025-09-13_10-53-42-183.png</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="test-case">
+            <div class="test-case-header">
+                <div>
+                    <span class="test-case-id">TC002</span>
+                    <span class="test-case-title">错误用户名登录测试</span>
+                </div>
+                <div class="test-case-status pass">✅ PASS</div>
+            </div>
+            <div class="test-case-content">
+                <div class="test-description">
+                    <strong>测试描述:</strong> 使用错误的用户名进行登录测试
+                </div>
+
+                <div class="test-steps">
+                    <h4>🔧 测试步骤:</h4>
+                    <ul class="step-list">
+                        <li>1. 导航到登录页面: https://practicetestautomation.com/practice-test-login/</li>
+                        <li>2. 在用户名输入框输入'incorrectUser'</li>
+                        <li>3. 在密码输入框输入'Password123'</li>
+                        <li>4. 点击'Submit'按钮</li>
+                        <li>5. 验证错误消息显示</li>
+                        <li>6. 截图记录错误状态</li>
+
+                    </ul>
+                </div>
+
+                <div class="expected-result">
+                    <h4>✅ 预期结果:</h4>
+                    <p>显示用户名错误提示信息</p>
+                </div>
+
+
+                <div class="screenshots-section">
+                    <h4>📸 测试截图 (3张)</h4>
+                    <div class="screenshot-grid">
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/登录用例2_输入错误用户名_Edge_2025-09-13_10-53-43-383.png" alt="登录用例2_输入错误用户名"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\登录用例2_输入错误用户名_Edge_2025-09-13_10-53-43-383.png</div>
+                                        <div><strong>文件大小:</strong> 71795 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">登录用例2_输入错误用户名</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\登录用例2_输入错误用户名_Edge_2025-09-13_10-53-43-383.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/登录用例2_输入密码_Edge_2025-09-13_10-53-44-592.png" alt="登录用例2_输入密码"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\登录用例2_输入密码_Edge_2025-09-13_10-53-44-592.png</div>
+                                        <div><strong>文件大小:</strong> 33843 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">登录用例2_输入密码</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\登录用例2_输入密码_Edge_2025-09-13_10-53-44-592.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/登录用例2_错误用户名登录_Edge_2025-09-13_10-53-48-765.png" alt="登录用例2_错误用户名登录"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\登录用例2_错误用户名登录_Edge_2025-09-13_10-53-48-765.png</div>
+                                        <div><strong>文件大小:</strong> 34623 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">登录用例2_错误用户名登录</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\登录用例2_错误用户名登录_Edge_2025-09-13_10-53-48-765.png</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="test-case">
+            <div class="test-case-header">
+                <div>
+                    <span class="test-case-id">TC003</span>
+                    <span class="test-case-title">错误密码登录测试</span>
+                </div>
+                <div class="test-case-status pass">✅ PASS</div>
+            </div>
+            <div class="test-case-content">
+                <div class="test-description">
+                    <strong>测试描述:</strong> 使用错误的密码进行登录测试
+                </div>
+
+                <div class="test-steps">
+                    <h4>🔧 测试步骤:</h4>
+                    <ul class="step-list">
+                        <li>1. 导航到登录页面: https://practicetestautomation.com/practice-test-login/</li>
+                        <li>2. 在用户名输入框输入'student'</li>
+                        <li>3. 在密码输入框输入'incorrectPassword'</li>
+                        <li>4. 点击'Submit'按钮</li>
+                        <li>5. 验证错误消息显示</li>
+                        <li>6. 截图记录错误状态</li>
+
+                    </ul>
+                </div>
+
+                <div class="expected-result">
+                    <h4>✅ 预期结果:</h4>
+                    <p>显示密码错误提示信息</p>
+                </div>
+
+
+                <div class="screenshots-section">
+                    <h4>📸 测试截图 (3张)</h4>
+                    <div class="screenshot-grid">
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/登录用例3_输入正确用户名_Edge_2025-09-13_10-53-53-810.png" alt="登录用例3_输入正确用户名"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\登录用例3_输入正确用户名_Edge_2025-09-13_10-53-53-810.png</div>
+                                        <div><strong>文件大小:</strong> 31837 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">登录用例3_输入正确用户名</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\登录用例3_输入正确用户名_Edge_2025-09-13_10-53-53-810.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/登录用例3_输入错误密码_Edge_2025-09-13_10-53-55-009.png" alt="登录用例3_输入错误密码"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\登录用例3_输入错误密码_Edge_2025-09-13_10-53-55-009.png</div>
+                                        <div><strong>文件大小:</strong> 33517 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">登录用例3_输入错误密码</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\登录用例3_输入错误密码_Edge_2025-09-13_10-53-55-009.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/登录用例3_错误密码登录_Edge_2025-09-13_10-53-59-182.png" alt="登录用例3_错误密码登录"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\登录用例3_错误密码登录_Edge_2025-09-13_10-53-59-182.png</div>
+                                        <div><strong>文件大小:</strong> 34663 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">登录用例3_错误密码登录</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\登录用例3_错误密码登录_Edge_2025-09-13_10-53-59-182.png</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="test-case">
+            <div class="test-case-header">
+                <div>
+                    <span class="test-case-id">TC004</span>
+                    <span class="test-case-title">NoSuchElementException异常测试</span>
+                </div>
+                <div class="test-case-status pass">✅ PASS</div>
+            </div>
+            <div class="test-case-content">
+                <div class="test-description">
+                    <strong>测试描述:</strong> 测试当页面元素不存在时的异常处理
+                </div>
+
+                <div class="test-steps">
+                    <h4>🔧 测试步骤:</h4>
+                    <ul class="step-list">
+                        <li>1. 导航到异常测试页面</li>
+                        <li>2. 尝试查找不存在的页面元素</li>
+                        <li>3. 捕获NoSuchElementException异常</li>
+                        <li>4. 验证异常处理机制</li>
+                        <li>5. 记录异常信息</li>
+                        <li>6. 截图记录异常状态</li>
+
+                    </ul>
+                </div>
+
+                <div class="expected-result">
+                    <h4>✅ 预期结果:</h4>
+                    <p>正确捕获并处理NoSuchElementException异常</p>
+                </div>
+
+
+                <div class="screenshots-section">
+                    <h4>📸 测试截图 (4张)</h4>
+                    <div class="screenshot-grid">
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/异常测试_用例1_步骤1_滚动到标题_Edge_2025-09-13_10-54-08-762.png" alt="异常测试_用例1_步骤1_滚动到标题"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\异常测试_用例1_步骤1_滚动到标题_Edge_2025-09-13_10-54-08-762.png</div>
+                                        <div><strong>文件大小:</strong> 68834 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">异常测试_用例1_步骤1_滚动到标题</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\异常测试_用例1_步骤1_滚动到标题_Edge_2025-09-13_10-54-08-762.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/异常测试_用例1_步骤2_Add按钮高亮_Edge_2025-09-13_10-54-10-913.png" alt="异常测试_用例1_步骤2_Add按钮高亮"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\异常测试_用例1_步骤2_Add按钮高亮_Edge_2025-09-13_10-54-10-913.png</div>
+                                        <div><strong>文件大小:</strong> 68817 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">异常测试_用例1_步骤2_Add按钮高亮</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\异常测试_用例1_步骤2_Add按钮高亮_Edge_2025-09-13_10-54-10-913.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/异常测试_用例1_步骤3_点击Add按钮_Edge_2025-09-13_10-54-11-097.png" alt="异常测试_用例1_步骤3_点击Add按钮"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\异常测试_用例1_步骤3_点击Add按钮_Edge_2025-09-13_10-54-11-097.png</div>
+                                        <div><strong>文件大小:</strong> 64824 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">异常测试_用例1_步骤3_点击Add按钮</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\异常测试_用例1_步骤3_点击Add按钮_Edge_2025-09-13_10-54-11-097.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/异常测试_用例1_步骤4_捕获异常_Edge_2025-09-13_10-54-21-305.png" alt="异常测试_用例1_步骤4_捕获异常"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\异常测试_用例1_步骤4_捕获异常_Edge_2025-09-13_10-54-21-305.png</div>
+                                        <div><strong>文件大小:</strong> 165084 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">异常测试_用例1_步骤4_捕获异常</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\异常测试_用例1_步骤4_捕获异常_Edge_2025-09-13_10-54-21-305.png</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="test-case">
+            <div class="test-case-header">
+                <div>
+                    <span class="test-case-id">TC005</span>
+                    <span class="test-case-title">ElementNotInteractableException异常测试</span>
+                </div>
+                <div class="test-case-status pass">✅ PASS</div>
+            </div>
+            <div class="test-case-content">
+                <div class="test-description">
+                    <strong>测试描述:</strong> 测试当页面元素不可交互时的异常处理
+                </div>
+
+                <div class="test-steps">
+                    <h4>🔧 测试步骤:</h4>
+                    <ul class="step-list">
+                        <li>1. 导航到异常测试页面</li>
+                        <li>2. 尝试与不可交互的元素进行交互</li>
+                        <li>3. 捕获ElementNotInteractableException异常</li>
+                        <li>4. 验证异常处理机制</li>
+                        <li>5. 记录异常信息</li>
+                        <li>6. 截图记录异常状态</li>
+
+                    </ul>
+                </div>
+
+                <div class="expected-result">
+                    <h4>✅ 预期结果:</h4>
+                    <p>正确捕获并处理ElementNotInteractableException异常</p>
+                </div>
+
+
+                <div class="screenshots-section">
+                    <h4>📸 测试截图 (5张)</h4>
+                    <div class="screenshot-grid">
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/异常测试_用例2_步骤1_滚动到标题_Edge_2025-09-13_10-54-32-137.png" alt="异常测试_用例2_步骤1_滚动到标题"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\异常测试_用例2_步骤1_滚动到标题_Edge_2025-09-13_10-54-32-137.png</div>
+                                        <div><strong>文件大小:</strong> 69237 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">异常测试_用例2_步骤1_滚动到标题</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\异常测试_用例2_步骤1_滚动到标题_Edge_2025-09-13_10-54-32-137.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/异常测试_用例2_步骤2_Add按钮高亮_Edge_2025-09-13_10-54-34-280.png" alt="异常测试_用例2_步骤2_Add按钮高亮"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\异常测试_用例2_步骤2_Add按钮高亮_Edge_2025-09-13_10-54-34-280.png</div>
+                                        <div><strong>文件大小:</strong> 69235 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">异常测试_用例2_步骤2_Add按钮高亮</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\异常测试_用例2_步骤2_Add按钮高亮_Edge_2025-09-13_10-54-34-280.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/异常测试_用例2_步骤3_点击Add按钮_等待Row2_Edge_2025-09-13_10-54-39-543.png" alt="异常测试_用例2_步骤3_点击Add按钮_等待Row2"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\异常测试_用例2_步骤3_点击Add按钮_等待Row2_Edge_2025-09-13_10-54-39-543.png</div>
+                                        <div><strong>文件大小:</strong> 71786 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">异常测试_用例2_步骤3_点击Add按钮_等待Row2</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\异常测试_用例2_步骤3_点击Add按钮_等待Row2_Edge_2025-09-13_10-54-39-543.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/异常测试_用例2_步骤4_输入文本_Edge_2025-09-13_10-54-39-774.png" alt="异常测试_用例2_步骤4_输入文本"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\异常测试_用例2_步骤4_输入文本_Edge_2025-09-13_10-54-39-774.png</div>
+                                        <div><strong>文件大小:</strong> 75633 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">异常测试_用例2_步骤4_输入文本</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\异常测试_用例2_步骤4_输入文本_Edge_2025-09-13_10-54-39-774.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/异常测试_用例2_步骤5_捕获异常_Edge_2025-09-13_10-54-52-137.png" alt="异常测试_用例2_步骤5_捕获异常"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\异常测试_用例2_步骤5_捕获异常_Edge_2025-09-13_10-54-52-137.png</div>
+                                        <div><strong>文件大小:</strong> 158742 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">异常测试_用例2_步骤5_捕获异常</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\异常测试_用例2_步骤5_捕获异常_Edge_2025-09-13_10-54-52-137.png</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="test-case">
+            <div class="test-case-header">
+                <div>
+                    <span class="test-case-id">TC006</span>
+                    <span class="test-case-title">InvalidElementStateException异常测试</span>
+                </div>
+                <div class="test-case-status pass">✅ PASS</div>
+            </div>
+            <div class="test-case-content">
+                <div class="test-description">
+                    <strong>测试描述:</strong> 测试尝试清空禁用输入框时的异常处理
+                </div>
+
+                <div class="test-steps">
+                    <h4>🔧 测试步骤:</h4>
+                    <ul class="step-list">
+                        <li>1. 导航到异常测试页面</li>
+                        <li>2. 滚动到页面标题处</li>
+                        <li>3. 尝试清空禁用的输入框</li>
+                        <li>4. 捕获InvalidElementStateException异常</li>
+                        <li>5. 验证异常处理机制</li>
+                        <li>6. 记录异常信息</li>
+                        <li>7. 截图记录异常状态</li>
+
+                    </ul>
+                </div>
+
+                <div class="expected-result">
+                    <h4>✅ 预期结果:</h4>
+                    <p>正确捕获并处理InvalidElementStateException异常</p>
+                </div>
+
+
+                <div class="screenshots-section">
+                    <h4>📸 测试截图 (3张)</h4>
+                    <div class="screenshot-grid">
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/异常测试_用例3_步骤1_滚动到标题_Edge_2025-09-13_10-55-02-985.png" alt="异常测试_用例3_步骤1_滚动到标题"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\异常测试_用例3_步骤1_滚动到标题_Edge_2025-09-13_10-55-02-985.png</div>
+                                        <div><strong>文件大小:</strong> 69237 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">异常测试_用例3_步骤1_滚动到标题</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\异常测试_用例3_步骤1_滚动到标题_Edge_2025-09-13_10-55-02-985.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/异常测试_用例3_步骤2_禁用输入框高亮_Edge_2025-09-13_10-55-05-129.png" alt="异常测试_用例3_步骤2_禁用输入框高亮"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\异常测试_用例3_步骤2_禁用输入框高亮_Edge_2025-09-13_10-55-05-129.png</div>
+                                        <div><strong>文件大小:</strong> 69326 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">异常测试_用例3_步骤2_禁用输入框高亮</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\异常测试_用例3_步骤2_禁用输入框高亮_Edge_2025-09-13_10-55-05-129.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/异常测试_用例3_步骤2_捕获异常_Edge_2025-09-13_10-55-05-304.png" alt="异常测试_用例3_步骤2_捕获异常"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\异常测试_用例3_步骤2_捕获异常_Edge_2025-09-13_10-55-05-304.png</div>
+                                        <div><strong>文件大小:</strong> 163507 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">异常测试_用例3_步骤2_捕获异常</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\异常测试_用例3_步骤2_捕获异常_Edge_2025-09-13_10-55-05-304.png</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="test-case">
+            <div class="test-case-header">
+                <div>
+                    <span class="test-case-id">TC007</span>
+                    <span class="test-case-title">StaleElementReferenceException异常测试</span>
+                </div>
+                <div class="test-case-status pass">✅ PASS</div>
+            </div>
+            <div class="test-case-content">
+                <div class="test-description">
+                    <strong>测试描述:</strong> 测试获取元素引用后点击Add按钮移除元素时的异常处理
+                </div>
+
+                <div class="test-steps">
+                    <h4>🔧 测试步骤:</h4>
+                    <ul class="step-list">
+                        <li>1. 导航到异常测试页面</li>
+                        <li>2. 获取instructions元素的引用</li>
+                        <li>3. 点击Add按钮移除instructions元素</li>
+                        <li>4. 尝试访问已过期的元素引用</li>
+                        <li>5. 捕获StaleElementReferenceException异常</li>
+                        <li>6. 验证异常处理机制</li>
+                        <li>7. 记录异常信息</li>
+                        <li>8. 截图记录异常状态</li>
+
+                    </ul>
+                </div>
+
+                <div class="expected-result">
+                    <h4>✅ 预期结果:</h4>
+                    <p>正确捕获并处理StaleElementReferenceException异常</p>
+                </div>
+
+
+                <div class="screenshots-section">
+                    <h4>📸 测试截图 (3张)</h4>
+                    <div class="screenshot-grid">
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/异常测试_用例4_步骤1_获取元素引用_Edge_2025-09-13_10-55-17-133.png" alt="异常测试_用例4_步骤1_获取元素引用"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\异常测试_用例4_步骤1_获取元素引用_Edge_2025-09-13_10-55-17-133.png</div>
+                                        <div><strong>文件大小:</strong> 69235 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">异常测试_用例4_步骤1_获取元素引用</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\异常测试_用例4_步骤1_获取元素引用_Edge_2025-09-13_10-55-17-133.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/异常测试_用例4_步骤2_点击Add按钮_Edge_2025-09-13_10-55-22-312.png" alt="异常测试_用例4_步骤2_点击Add按钮"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\异常测试_用例4_步骤2_点击Add按钮_Edge_2025-09-13_10-55-22-312.png</div>
+                                        <div><strong>文件大小:</strong> 71594 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">异常测试_用例4_步骤2_点击Add按钮</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\异常测试_用例4_步骤2_点击Add按钮_Edge_2025-09-13_10-55-22-312.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/异常测试_用例4_步骤3_捕获异常_Edge_2025-09-13_10-55-22-480.png" alt="异常测试_用例4_步骤3_捕获异常"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\异常测试_用例4_步骤3_捕获异常_Edge_2025-09-13_10-55-22-480.png</div>
+                                        <div><strong>文件大小:</strong> 163583 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">异常测试_用例4_步骤3_捕获异常</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\异常测试_用例4_步骤3_捕获异常_Edge_2025-09-13_10-55-22-480.png</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="test-case">
+            <div class="test-case-header">
+                <div>
+                    <span class="test-case-id">TC008</span>
+                    <span class="test-case-title">TimeoutException异常测试</span>
+                </div>
+                <div class="test-case-status pass">✅ PASS</div>
+            </div>
+            <div class="test-case-content">
+                <div class="test-description">
+                    <strong>测试描述:</strong> 测试设置3秒超时等待Row 2出现(需要5秒)时的异常处理
+                </div>
+
+                <div class="test-steps">
+                    <h4>🔧 测试步骤:</h4>
+                    <ul class="step-list">
+                        <li>1. 导航到异常测试页面</li>
+                        <li>2. 点击Add按钮</li>
+                        <li>3. 设置3秒超时等待Row 2出现(但Row 2需要5秒才出现)</li>
+                        <li>4. 捕获TimeoutException异常</li>
+                        <li>5. 验证异常处理机制</li>
+                        <li>6. 记录异常信息</li>
+                        <li>7. 截图记录异常状态</li>
+
+                    </ul>
+                </div>
+
+                <div class="expected-result">
+                    <h4>✅ 预期结果:</h4>
+                    <p>正确捕获并处理TimeoutException异常</p>
+                </div>
+
+
+                <div class="screenshots-section">
+                    <h4>📸 测试截图 (3张)</h4>
+                    <div class="screenshot-grid">
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/异常测试_用例5_步骤1_Add按钮高亮_Edge_2025-09-13_10-55-34-407.png" alt="异常测试_用例5_步骤1_Add按钮高亮"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\异常测试_用例5_步骤1_Add按钮高亮_Edge_2025-09-13_10-55-34-407.png</div>
+                                        <div><strong>文件大小:</strong> 69235 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">异常测试_用例5_步骤1_Add按钮高亮</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\异常测试_用例5_步骤1_Add按钮高亮_Edge_2025-09-13_10-55-34-407.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/异常测试_用例5_步骤1_点击Add按钮_Edge_2025-09-13_10-55-34-573.png" alt="异常测试_用例5_步骤1_点击Add按钮"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\异常测试_用例5_步骤1_点击Add按钮_Edge_2025-09-13_10-55-34-573.png</div>
+                                        <div><strong>文件大小:</strong> 64823 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">异常测试_用例5_步骤1_点击Add按钮</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\异常测试_用例5_步骤1_点击Add按钮_Edge_2025-09-13_10-55-34-573.png</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="file:///F:/github/auto_test_quiz/screenshots/edge_tests_20250913_105329/异常测试_用例5_步骤2_捕获异常_Edge_2025-09-13_10-55-45-251.png" alt="异常测试_用例5_步骤2_捕获异常"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="screenshot-placeholder" style="display: none;">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">📸</div>
+                                    <div class="placeholder-text">图片未加载</div>
+                                    <div class="placeholder-info">
+                                        <div><strong>完整路径:</strong> F:\github\auto_test_quiz\screenshots\edge_tests_20250913_105329\异常测试_用例5_步骤2_捕获异常_Edge_2025-09-13_10-55-45-251.png</div>
+                                        <div><strong>文件大小:</strong> 152528 bytes</div>
+                                        <div><strong>如图片无法显示，请直接打开上述路径查看</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenshot-info">
+                                <div class="screenshot-title">异常测试_用例5_步骤2_捕获异常</div>
+                                <div class="screenshot-path">screenshots\edge_tests_20250913_105329\异常测试_用例5_步骤2_捕获异常_Edge_2025-09-13_10-55-45-251.png</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+
+        <div class="footer">
+            <p>📊 测试完成时间: 2025-09-13 10:55:59 | 🌐 Edge自动化测试系统生成</p>
+            <p>💡 本报告格式与Chrome测试报告保持一致，确保跨浏览器测试的统一性</p>
+        </div>
+    </div>
+</body>
+</html>

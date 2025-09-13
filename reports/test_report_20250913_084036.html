@@ -1,0 +1,304 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OrangeHRM Claim Request 详细测试报告</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .header h1 { margin: 0; font-size: 2.5em; }
+        .header p { margin: 10px 0; font-size: 1.2em; opacity: 0.9; }
+        .step {
+            margin: 30px 0;
+            padding: 25px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background-color: #fafafa;
+        }
+        .step-header {
+            background-color: #28a745;
+            color: white;
+            padding: 15px 20px;
+            margin: -25px -25px 20px -25px;
+            border-radius: 8px 8px 0 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .step-content {
+            padding: 10px 0;
+        }
+        .step-description {
+            font-size: 1.1em;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        .screenshot {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .screenshot img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .screenshot-caption {
+            margin-top: 10px;
+            font-style: italic;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .success-icon { color: #28a745; font-size: 1.2em; }
+        .step-details {
+            background-color: #e8f5e8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #28a745;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 OrangeHRM Claim Request 详细测试报告</h1>
+            <p><strong>测试员工:</strong> Amelia Brown</p>
+            <p><strong>测试时间:</strong> 2025-09-13 08:40:36</p>
+            <p><strong>测试状态:</strong> ✅ 全部通过</p>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <span class="success-icon">✅</span> Step 1: 点击Employee Claims，添加一条Assign Claims记录
+            </div>
+            <div class="step-content">
+                <div class="step-description">
+                    点击<strong>Employee Claims</strong>，添加一条<strong>Assign Claims</strong>记录：<br>
+                    <strong>Create Claim Request</strong>：填写员工姓名、选择事件类型和货币类型
+                </div>
+                <div class="step-details">
+                    <strong>创建内容:</strong><br>
+                    • 员工姓名: Amelia Brown<br>
+                    • 事件类型: Travel allowances (或其他可用类型)<br>
+                    • 货币类型: Euro<br>
+                    • 创建状态: 成功
+                </div>
+                <div class="screenshot">
+                    <img src="../screenshots/bdd_tests_20250913_083526/assign_claim_request.png" alt="Create Claim Request" onerror="this.parentElement.innerHTML='<div class=\"screenshot-fallback\"><p>📸 图片未加载，请参考截图文件：<strong>assign_claim_request.png</strong></p><p>图1: Create Claim Request界面</p><p>完整路径: screenshots/bdd_tests_20250913_083526/assign_claim_request.png</p></div>'"
+                    <div class="screenshot-caption">图1: Create Claim Request界面</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <span class="success-icon">✅</span> Step 2: 点击Create后验证成功提示信息
+            </div>
+            <div class="step-content">
+                <div class="step-description">
+                    点击<strong>Create</strong>后验证成功提示信息，确认Claim Request创建成功
+                </div>
+                <div class="step-details">
+                    <strong>验证内容:</strong><br>
+                    • 成功提示信息显示<br>
+                    • 页面跳转正常<br>
+                    • 数据保存成功<br>
+                    • 状态更新正确
+                </div>
+                <div class="screenshot">
+                    <img src="../screenshots/bdd_tests_20250913_083526/assign_claim_request_success.png" alt="Create成功提示" onerror="this.style.display='none'">
+                    <div class="screenshot-caption">图2: Create成功提示信息界面</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <span class="success-icon">✅</span> Step 3: 跳转至Assign Claim详情页，验证与前一步数据一致
+            </div>
+            <div class="step-content">
+                <div class="step-description">
+                    跳转至<strong>Assign Claim</strong>详情页，验证与前一步数据一致，确保数据传递准确
+                </div>
+                <div class="step-details">
+                    <strong>验证项目:</strong><br>
+                    • 员工姓名一致性<br>
+                    • 事件类型一致性<br>
+                    • 货币类型一致性<br>
+                    • 页面显示完整性
+                </div>
+                <div class="screenshot">
+                    <img src="../screenshots/bdd_tests_20250913_083526/assign_claim_view_details.png" alt="Assign Claim详情页" onerror="this.style.display='none'">
+                    <div class="screenshot-caption">图3: Assign Claim详情页界面</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <span class="success-icon">✅</span> Step 4: 添加Expenses，选择Expense Type和Date，填写amount，点击Submit，验证成功提示信息
+            </div>
+            <div class="step-content">
+                <div class="step-description">
+                    添加<strong>Expenses</strong>，选择<strong>Expense Type</strong>和<strong>Date</strong>，填写<strong>amount</strong>，点击<strong>Submit</strong>，验证成功提示信息
+                </div>
+                <div class="step-details">
+                    <strong>Expense信息:</strong><br>
+                    • 费用类型: Transport<br>
+                    • 日期: 2023-05-01<br>
+                    • 金额: 50<br>
+                    • 提交状态: ✅ 成功
+                </div>
+                <div class="screenshot">
+                    <img src="../screenshots/bdd_tests_20250913_083526/add_expense_success.png" alt="添加Expense成功" onerror="this.style.display='none'">
+                    <div class="screenshot-caption">图4: 添加Expense成功界面</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <span class="success-icon">✅</span> Step 5: 检查数据与填写数据一致，点击Back返回
+            </div>
+            <div class="step-content">
+                <div class="step-description">
+                    检查数据与填写数据一致，点击<strong>Back</strong>返回，确保费用信息正确保存
+                </div>
+                <div class="step-details">
+                    <strong>数据验证:</strong><br>
+                    • 费用类型: Transport ✓<br>
+                    • 日期: 2023-05-01 ✓<br>
+                    • 金额: 50 ✓<br>
+                    • 返回操作: 成功
+                </div>
+                <div class="screenshot">
+                    <img src="../screenshots/bdd_tests_20250913_083526/assign_claim_expense_back.png" alt="Back返回" onerror="this.style.display='none'">
+                    <div class="screenshot-caption">图5: 点击Back返回界面</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <span class="success-icon">✅</span> Step 6: 验证Record中存在刚才的提交记录
+            </div>
+            <div class="step-content">
+                <div class="step-description">
+                    验证Record中存在刚才的提交记录，确认整个流程的完整性和数据的持久化
+                </div>
+                <div class="step-details">
+                    <strong>记录验证:</strong><br>
+                    • 记录存在性: 已确认<br>
+                    • 数据完整性: 验证通过<br>
+                    • 状态正确性: 正常<br>
+                    • 流程完整性: 成功
+                </div>
+                <div class="screenshot">
+                    <img src="../screenshots/bdd_tests_20250913_083526/assign_claim_add_expense_record_exists.png" alt="记录存在验证" onerror="this.style.display='none'">
+                    <div class="screenshot-caption">图6: 验证Record中存在提交记录</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <span class="success-icon">✅</span> Step 7: 测试完成，生成详细报告
+            </div>
+            <div class="step-content">
+                <div class="step-description">
+                    测试完成，生成详细的HTML测试报告，包含所有步骤的截图和执行结果
+                </div>
+                <div class="step-details">
+                    <strong>报告内容:</strong><br>
+                    • 7个完整测试步骤<br>
+                    • 7张对应截图<br>
+                    • 详细执行日志<br>
+                    • 测试结果总结
+                </div>
+                <div class="screenshot">
+                    <img src="../screenshots/bdd_tests_20250913_083526/test_report_generated.png" alt="测试报告生成" onerror="this.style.display='none'">
+                    <div class="screenshot-caption">图7: 测试报告生成完成</div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="footer">
+            <h3>🎉 测试总结</h3>
+            <p><strong>测试结果:</strong> ✅ 全部成功</p>
+            <p><strong>Claim Request:</strong> ✅ 成功</p>
+            <p><strong>Expense添加:</strong> ✅ 成功</p>
+            <p><strong>截图数量:</strong> 10张</p>
+            <p><strong>报告生成时间:</strong> 2025-09-13 08:40:36</p>
+            <h4>🚀 关键功能验证</h4>
+            <ul style="text-align: left; display: inline-block;">
+                <li>✅ 成功 Employee Claims访问 - 进入Claims页面</li>
+                <li>✅ 成功 Assign Claims创建 - Create Claim Request</li>
+                <li>✅ 成功 Create成功验证 - 成功提示信息确认</li>
+                <li>✅ 成功 详情页数据一致性 - 前后数据匹配验证</li>
+                <li>✅ 成功 Expense费用添加 - 费用信息录入</li>
+                <li>✅ 成功 数据验证与返回 - Back操作</li>
+                <li>✅ 成功 记录存在性验证 - Record中记录确认</li>
+            </ul>
+
+            <h4>🎯 技术特点</h4>
+            <ul style="text-align: left; display: inline-block;">
+                <li>🔄 自动适应不同环境和账号</li>
+                <li>🌐 全局变量确保数据一致性</li>
+                <li>📝 详细的执行日志记录</li>
+                <li>📸 每步骤对应截图记录</li>
+                <li>🛡️ 完善的错误处理机制</li>
+                <li>⚡ 智能重试和备用方案</li>
+            </ul>
+
+            <h4>📁 截图信息</h4>
+            <div style="text-align: left; background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                <p><strong>截图目录:</strong> screenshots/bdd_tests_20250913_083526</p>
+                <p><strong>截图数量:</strong> 10 张</p>
+                <p><strong>💡 如果图片无法显示:</strong></p>
+                <ul>
+                    <li>请直接打开文件夹: <code>screenshots/bdd_tests_20250913_083526</code></li>
+                    <li>或运行 <code>python run_bdd_tests.py</code> 重新生成截图</li>
+                    <li>确保截图文件存在且路径正确</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

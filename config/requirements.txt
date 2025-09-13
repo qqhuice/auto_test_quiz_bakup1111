@@ -1,0 +1,22 @@
+selenium==4.15.2
+webdriver-manager==4.0.1
+pytest==7.4.3
+pytest-html==4.1.1
+pytest-xdist==3.3.1
+allure-pytest==2.13.2
+Pillow==10.1.0
+PyYAML==6.0.1
+python-dotenv==1.0.0
+loguru==0.7.2
+pandas==2.1.3
+openpyxl==3.1.2
+requests==2.31.0
+python-dateutil==2.8.2
+typing-extensions==4.8.0
+
+# BDD框架依赖
+behave==1.2.6
+behave-html-formatter==0.9.10
+
+# 测试顺序控制
+pytest-ordering==0.6

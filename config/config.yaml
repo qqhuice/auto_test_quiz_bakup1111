@@ -1,0 +1,49 @@
+# 测试配置文件
+test_config:
+  # 浏览器配置
+  browser:
+    default: "chrome"
+    headless: false
+    window_size: "1920,1080"
+    implicit_wait: 10
+    explicit_wait: 20
+    page_load_timeout: 30
+    # 支持的浏览器: chrome, edge, edge_ie, edge_standard
+    supported_browsers: ["chrome", "edge", "edge_ie", "edge_standard"]
+    
+  # 测试网站URL
+  urls:
+    practice_home: "https://practicetestautomation.com/practice/"
+    login_page: "https://practicetestautomation.com/practice-test-login/"
+    exceptions_page: "https://practicetestautomation.com/practice-test-exceptions/"
+    orangehrm: "https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index"
+    
+  # 测试数据
+  test_data:
+    login:
+      valid_username: "student"
+      valid_password: "Password123"
+      invalid_username: "incorrectUser"
+      invalid_password: "incorrectPassword"
+    
+  # 截图配置
+  screenshot:
+    enabled: true
+    on_failure: true
+    on_success: true
+    format: "png"
+    quality: 95
+    
+  # 报告配置
+  report:
+    title: "Auto Test Quiz - 自动化测试报告"
+    description: "Auto Test Quiz 基础验证测试报告"
+    format: "html"
+    include_screenshots: true
+    
+  # 日志配置
+  logging:
+    level: "INFO"
+    format: "{time:YYYY-MM-DD HH:mm:ss} | {level} | {name}:{function}:{line} | {message}"
+    file_rotation: "10 MB"
+    file_retention: "7 days"

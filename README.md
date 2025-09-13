@@ -1,4 +1,4 @@
-# Open Automation Quiz
+# Auto Test Quiz
 ---
 
 ## 0. 任务要求
