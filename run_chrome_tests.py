@@ -274,50 +274,18 @@ class ChromeTestRunner:
                 "name": "错误密码登录测试",
                 "description": "使用错误的密码进行登录测试，验证错误处理",
                 "steps": [
-                    "1. 导航到登录页面: https://practicetestautomation.com/practice-test-login/",
-                    "2. 在用户名输入框输入'student'",
-                    "3. 在密码输入框输入'incorrectPassword'",
-                    "4. 点击'Submit'按钮",
-                    "5. 验证错误消息显示",
-                    "6. 截图记录错误状态"
+                    "1. 清空登录表单(清除TC002的输入和错误提示)",
+                    "2. 刷新页面确保干净的初始状态",
+                    "3. 在用户名输入框输入'student'",
+                    "4. 在密码输入框输入'incorrectPassword'",
+                    "5. 点击'Submit'按钮",
+                    "6. 验证错误消息显示",
+                    "7. 截图记录错误状态"
                 ],
-                "expected_result": "显示密码错误的提示消息",
+                "expected_result": "显示密码错误的提示消息，输入框和错误提示已清空",
                 "status": "✅ PASS" if success else "❌ FAIL"
             },
-            {
-                "id": "TC004",
-                "name": "NoSuchElementException异常测试",
-                "description": "验证NoSuchElementException的正确捕获和处理",
-                "steps": [
-                    "1. 导航到异常测试页面: https://practicetestautomation.com/practice-test-exceptions/",
-                    "2. 滚动到页面标题处",
-                    "3. 定位并高亮Add按钮",
-                    "4. 点击Add按钮",
-                    "5. 尝试查找不存在的Row 2输入框",
-                    "6. 捕获NoSuchElementException异常",
-                    "7. 显示异常信息面板",
-                    "8. 截图记录异常捕获过程"
-                ],
-                "expected_result": "成功捕获NoSuchElementException，显示异常信息",
-                "status": "✅ PASS" if success else "❌ FAIL"
-            },
-            {
-                "id": "TC005",
-                "name": "ElementNotInteractableException异常测试",
-                "description": "验证ElementNotInteractableException的正确捕获和处理",
-                "steps": [
-                    "1. 导航到异常测试页面: https://practicetestautomation.com/practice-test-exceptions/",
-                    "2. 刷新页面到初始状态",
-                    "3. 点击Add按钮生成Row 2",
-                    "4. 在Row 2输入框输入测试文本",
-                    "5. 尝试点击不可见的Save按钮",
-                    "6. 捕获ElementNotInteractableException异常",
-                    "7. 显示异常信息面板",
-                    "8. 截图记录异常捕获过程"
-                ],
-                "expected_result": "成功捕获ElementNotInteractableException，显示异常信息",
-                "status": "✅ PASS" if success else "❌ FAIL"
-            },
+
             {
                 "id": "TC004",
                 "name": "NoSuchElementException异常测试",
