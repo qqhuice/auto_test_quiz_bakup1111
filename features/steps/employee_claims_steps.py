@@ -302,10 +302,50 @@ def step_verify_expense_data(context):
     """验证费用数据匹配"""
     logger.info("验证费用数据匹配...")
     try:
-        # 这里可以添加具体的费用数据验证逻辑
-        # 暂时假设验证成功
-        time.sleep(2)
-        logger.info("✅ 费用数据验证通过")
+        # 检查页面上是否有费用数据
+        time.sleep(3)
+
+        # 验证费用类型是否已选择（检查下拉框是否有值）
+        expense_type_elements = context.driver.find_elements(By.XPATH, "//div[contains(@class,'oxd-select-text-input')]")
+
+        validation_passed = True
+        validation_errors = []
+
+        for element in expense_type_elements:
+            if element.text.strip() == "" or "-- Select --" in element.text:
+                validation_passed = False
+                validation_errors.append("费用类型未选择")
+                logger.error("❌ 费用类型为空或未选择")
+                break
+
+        # 验证日期字段
+        date_elements = context.driver.find_elements(By.XPATH, "//input[@placeholder='yyyy-dd-mm' or @placeholder='yyyy-mm-dd']")
+        for element in date_elements:
+            if element.get_attribute('value').strip() == "":
+                validation_passed = False
+                validation_errors.append("日期字段为空")
+                logger.error("❌ 日期字段为空")
+                break
+
+        # 验证金额字段
+        amount_elements = context.driver.find_elements(By.XPATH, "//input[@type='number' or contains(@class,'oxd-input')]")
+        for element in amount_elements:
+            value = element.get_attribute('value')
+            if value and value.strip() != "" and value != "0":
+                logger.info(f"✅ 找到金额字段值: {value}")
+                break
+        else:
+            validation_passed = False
+            validation_errors.append("金额字段为空或为0")
+            logger.error("❌ 金额字段为空或为0")
+
+        if validation_passed:
+            logger.info("✅ 费用数据验证通过")
+        else:
+            error_msg = f"费用数据验证失败: {', '.join(validation_errors)}"
+            logger.error(f"❌ {error_msg}")
+            context.screenshot_utils.take_screenshot(context.driver, "费用数据验证失败", context.browser_name)
+            raise AssertionError(error_msg)
 
     except Exception as e:
         logger.error(f"验证费用数据失败: {e}")

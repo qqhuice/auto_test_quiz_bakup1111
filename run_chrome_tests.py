@@ -153,31 +153,38 @@ class ChromeTestRunner:
 
         patterns = screenshot_patterns.get(test_case_id, [])
 
-        # 搜索实际的截图文件
+        # 🔧 修复：只使用最新的Chrome测试截图目录，避免使用旧截图
+        chrome_dirs = list(self.screenshots_dir.glob("chrome_*"))
+        if not chrome_dirs:
+            logger.warning("未找到任何Chrome测试截图目录")
+            return screenshots
+
+        # 按修改时间排序，获取最新的目录
+        latest_chrome_dir = max(chrome_dirs, key=lambda x: x.stat().st_mtime)
+        logger.info(f"使用最新的Chrome截图目录: {latest_chrome_dir.name}")
+
+        # 搜索实际的截图文件（只在最新目录中搜索）
         for pattern in patterns:
-            # 在所有截图目录中搜索匹配的文件
-            for screenshot_dir in self.screenshots_dir.glob("chrome_*"):
-                if screenshot_dir.is_dir():
-                    # 搜索PNG和JPG文件
-                    for ext in ['png', 'jpg', 'jpeg']:
-                        # 使用更安全的文件搜索方式
-                        for file_path in screenshot_dir.iterdir():
-                            if (file_path.is_file() and
-                                file_path.suffix.lower() == f'.{ext}' and
-                                pattern in file_path.name):
-                                # 计算相对路径
-                                relative_path = file_path.relative_to(self.screenshots_dir.parent)
-                                screenshots.append({
-                                    'title': pattern,
-                                    'path': str(relative_path),
-                                    'exists': file_path.exists(),
-                                    'size': file_path.stat().st_size if file_path.exists() else 0
-                                })
-                                break  # 只取第一个匹配的文件
-                        if screenshots and pattern in [s['title'] for s in screenshots]:
-                            break  # 找到文件就跳出扩展名循环
-                if screenshots and pattern in [s['title'] for s in screenshots]:
-                    break  # 找到这个模式的文件就跳出目录循环
+            if latest_chrome_dir.is_dir():
+                # 搜索PNG和JPG文件
+                for ext in ['png', 'jpg', 'jpeg']:
+                    # 使用更安全的文件搜索方式
+                    for file_path in latest_chrome_dir.iterdir():
+                        if (file_path.is_file() and
+                            file_path.suffix.lower() == f'.{ext}' and
+                            pattern in file_path.name):
+                            # 计算相对路径
+                            relative_path = file_path.relative_to(self.screenshots_dir.parent)
+                            screenshots.append({
+                                'title': pattern,
+                                'path': str(relative_path),
+                                'exists': file_path.exists(),
+                                'size': file_path.stat().st_size if file_path.exists() else 0
+                            })
+                            break  # 找到第一个匹配的文件就停止
+                    else:
+                        continue
+                    break  # 找到文件后跳出扩展名循环
 
         return screenshots
 

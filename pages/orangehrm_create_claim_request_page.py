@@ -746,8 +746,20 @@ class OrangeHRMCreateClaimRequestPage(BasePage):
             return False
 
     def add_expense(self, expense_type: str, date: str, amount: str):
-        """添加费用"""
+        """
+        添加费用，优先选择Transport，如果下拉菜单没有数据则刷新页面重试
+
+        Args:
+            expense_type: 费用类型（优先选择Transport）
+            date: 日期
+            amount: 金额
+        """
         logger.info(f"正在添加费用: 类型={expense_type}, 日期={date}, 金额={amount}")
+
+        # 优先选择Transport
+        preferred_expense_type = "Transport"
+        logger.info(f"优先选择费用类型: {preferred_expense_type}")
+
         try:
             # 查找并点击Add Expense按钮
             add_expense_selectors = [
@@ -766,29 +778,12 @@ class OrangeHRMCreateClaimRequestPage(BasePage):
                 except:
                     continue
 
-            # 选择费用类型
-            if expense_type:
-                expense_type_selectors = [
-                    (By.XPATH, "//label[text()='Expense Type']/following::div[contains(@class,'oxd-select-text-input')]"),
-                    (By.XPATH, "//select[@name='expense_type']"),
-                ]
+            # 选择费用类型（带刷新重试机制）
+            expense_type_selected = self._select_expense_type_with_retry(preferred_expense_type, expense_type)
 
-                for selector in expense_type_selectors:
-                    try:
-                        if self.is_element_visible(selector, timeout=5):
-                            element = self.find_element(selector)
-                            element.click()
-                            time.sleep(1)
-
-                            # 选择选项
-                            option_selector = (By.XPATH, f"//*[contains(text(),'{expense_type}')]")
-                            if self.is_element_visible(option_selector, timeout=5):
-                                option_element = self.find_element(option_selector)
-                                option_element.click()
-                                time.sleep(1)
-                            break
-                    except:
-                        continue
+            if not expense_type_selected:
+                logger.error(f"❌ 费用类型选择失败: {preferred_expense_type} 或 {expense_type}")
+                return False
 
             # 填写日期
             if date:
@@ -828,12 +823,171 @@ class OrangeHRMCreateClaimRequestPage(BasePage):
                     except:
                         continue
 
-            logger.info(f"✅ 已添加费用: {expense_type}, {date}, {amount}")
+            logger.info(f"✅ 已添加费用: {preferred_expense_type if expense_type_selected else expense_type}, {date}, {amount}")
             return True
 
         except Exception as e:
             logger.error(f"添加费用失败: {e}")
             return False
+
+    def _select_expense_type_with_retry(self, preferred_type: str, fallback_type: str, max_retries: int = 2):
+        """
+        选择费用类型，带刷新重试机制
+
+        Args:
+            preferred_type: 优先选择的费用类型（Transport）
+            fallback_type: 备用费用类型
+            max_retries: 最大重试次数
+
+        Returns:
+            bool: 是否成功选择费用类型
+        """
+        for attempt in range(max_retries + 1):
+            try:
+                logger.info(f"尝试选择费用类型，第{attempt + 1}次尝试")
+
+                # 选择费用类型下拉框
+                expense_type_selectors = [
+                    (By.XPATH, "//label[text()='Expense Type']/following::div[contains(@class,'oxd-select-text-input')]"),
+                    (By.XPATH, "//div[contains(@class,'oxd-select-text-input')]"),
+                    (By.XPATH, "//select[@name='expense_type']"),
+                ]
+
+                dropdown_clicked = False
+                for selector in expense_type_selectors:
+                    try:
+                        if self.is_element_visible(selector, timeout=5):
+                            element = self.find_element(selector)
+                            element.click()
+                            logger.info("✅ 成功点击费用类型下拉框")
+                            dropdown_clicked = True
+                            break
+                    except:
+                        continue
+
+                if not dropdown_clicked:
+                    logger.warning("未找到费用类型下拉框")
+                    if attempt < max_retries:
+                        continue
+                    else:
+                        return False
+
+                time.sleep(1)
+
+                # 检查下拉菜单是否有数据
+                option_elements = []
+                try:
+                    option_elements = self.driver.find_elements(By.XPATH, "//div[contains(@class,'oxd-select-option')] | //*[contains(text(),'Transport')] | //*[contains(text(),'Accommodation')] | //*[contains(text(),'Medical')]")
+                except:
+                    pass
+
+                if not option_elements or len(option_elements) <= 1:  # 只有"-- Select --"选项
+                    logger.warning(f"下拉菜单没有数据或只有默认选项，第{attempt + 1}次尝试")
+                    if attempt < max_retries:
+                        logger.info("刷新页面后重试...")
+                        self.driver.refresh()
+                        time.sleep(3)
+                        # 重新导航到添加费用区域
+                        self.navigate_to_add_expense_section()
+                        time.sleep(1)
+                        continue
+                    else:
+                        logger.error("下拉菜单始终没有数据")
+                        return False
+
+                # 尝试选择优先类型（Transport）
+                logger.info(f"尝试选择优先费用类型: {preferred_type}")
+                if self._try_select_option(preferred_type):
+                    logger.info(f"✅ 成功选择优先费用类型: {preferred_type}")
+                    return True
+
+                # 如果优先类型不可用，尝试选择任意可用选项
+                logger.info("优先类型不可用，尝试选择任意可用选项")
+                available_options = []
+                for element in option_elements:
+                    try:
+                        option_text = element.text.strip()
+                        if option_text and option_text != "-- Select --":
+                            available_options.append(option_text)
+                    except:
+                        continue
+
+                if available_options:
+                    # 优先选择Transport，如果没有则选择第一个可用选项
+                    selected_option = None
+                    if preferred_type in available_options:
+                        selected_option = preferred_type
+                    elif fallback_type in available_options:
+                        selected_option = fallback_type
+                    else:
+                        selected_option = available_options[0]
+
+                    logger.info(f"选择费用类型: {selected_option}")
+                    if self._try_select_option(selected_option):
+                        logger.info(f"✅ 成功选择费用类型: {selected_option}")
+                        return True
+
+                logger.warning(f"第{attempt + 1}次尝试选择费用类型失败")
+                if attempt < max_retries:
+                    logger.info("刷新页面后重试...")
+                    self.driver.refresh()
+                    time.sleep(3)
+                    # 重新导航到添加费用区域
+                    self.navigate_to_add_expense_section()
+                    time.sleep(1)
+
+            except Exception as e:
+                logger.error(f"第{attempt + 1}次尝试选择费用类型时发生错误: {e}")
+                if attempt < max_retries:
+                    logger.info("刷新页面后重试...")
+                    self.driver.refresh()
+                    time.sleep(3)
+                    # 重新导航到添加费用区域
+                    self.navigate_to_add_expense_section()
+                    time.sleep(1)
+
+        logger.error("所有尝试都失败，无法选择费用类型")
+        return False
+
+    def _try_select_option(self, option_text: str):
+        """
+        尝试选择指定的选项
+
+        Args:
+            option_text: 选项文本
+
+        Returns:
+            bool: 是否成功选择
+        """
+        option_selectors = [
+            (By.XPATH, f"//div[contains(@class,'oxd-select-option') and text()='{option_text}']"),
+            (By.XPATH, f"//div[contains(@class,'oxd-select-option') and contains(text(),'{option_text}')]"),
+            (By.XPATH, f"//*[contains(text(),'{option_text}')]"),
+            (By.XPATH, f"//option[text()='{option_text}']")
+        ]
+
+        for option_selector in option_selectors:
+            try:
+                if self.is_element_visible(option_selector, timeout=5):
+                    option_element = self.find_element(option_selector)
+                    option_element.click()
+                    time.sleep(1)
+
+                    # 验证是否选择成功
+                    try:
+                        selected_element = self.find_element((By.XPATH, "//div[contains(@class,'oxd-select-text-input')]"))
+                        selected_text = selected_element.text.strip()
+                        if selected_text and selected_text != "-- Select --" and option_text in selected_text:
+                            logger.info(f"✅ 费用类型选择验证通过: '{selected_text}'")
+                            return True
+                    except:
+                        pass
+
+                    return True
+            except:
+                continue
+
+        return False
 
     def submit_expense(self):
         """提交费用"""
